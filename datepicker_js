@@ -1,0 +1,18 @@
+<script>
+  const todayDate = new Date(Date.now()).toLocaleString("ru-RU").split(',')[0]
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.getElementById("datepicker_from")
+    var elems2 = document.getElementById("datepicker_to");    
+    var instances = M.Datepicker.init(elems,{format: 'dd.mm.yyyy', autoClose: true});
+    var instances2 = M.Datepicker.init(elems2,{format: 'dd.mm.yyyy', autoClose: true});
+    
+    var date = new Date(), y = date.getFullYear(), m = date.getMonth();
+    var firstDay = new Date(y, m, 1);
+    var lastDay = new Date(y, m + 1, 0);
+
+    
+    elems.defaultValue = firstDay.toLocaleString("ru-RU").split(',')[0]
+    elems2.defaultValue = lastDay.toLocaleString("ru-RU").split(',')[0]   
+  });
+</script>
