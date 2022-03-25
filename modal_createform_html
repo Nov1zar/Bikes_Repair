@@ -1,0 +1,84 @@
+<div id="modal3" class="modal modal-fixed-footer">
+  <div class="modal-content">
+    <h4>Создать новую форму ремонта</h4>
+    <p>Заполни информацию о велосипеде и райдере, обязательно отметь, кому принадлежит данный велосипед, находится ли он в аренде</p>
+    <p>Когда все заполнишь - нажми создать, и форма появится в самом низу таблицы</p>
+
+      <div class="row input-field col s12">
+        <input id="bike_id" type="text" class="validate" required>
+        <label for="bike_id">Номер велосипеда</label>
+      </div>
+
+      <div class="row input-field col s12">
+        <input id="rider_name" type="text" class="validate" required>
+        <label for="rider_name">ФИО Райдера</label>
+      </div>
+
+      <div  class="row input-field col s12">
+        <select id="assigned_worker">
+          <option value="" disabled selected>Укажи мастера по ремонту</option>
+
+        <!-- <input  type="text" class="validate" required> -->
+        <label for="assigned_worker">Мастер по ремонту</label>
+        </select>
+      </div>
+    
+    <div class="row">
+      <div class="col s3">
+        <p>Тип велосипеда:</p>
+        <div class="switch">
+          <label>
+            Педальный
+            <input id="bike_type" type="checkbox">
+            <span class="lever"></span>
+            Электрический
+          </label>
+        </div>
+      </div>
+
+      <div class="col s3">
+        <p>Владелец велосипеда?</p>
+        <div class="switch">
+          <label>
+            Райдер
+            <input id="bike_owner" type="checkbox">
+            <span class="lever"></span>
+            Компания
+          </label>
+        </div>
+      </div>
+
+
+      <div class="col s3">
+        <p>Велосипед в аренде?</p>
+        <div class="switch">
+          <label>
+            Нет
+            <input id="bike_rent" type="checkbox">
+            <span class="lever"></span>
+            Да
+          </label>
+        </div>
+      </div>
+
+
+
+      <div class="col s3"><p>Ремонт по ТО?</p>
+        <div class="switch">
+          <label>
+            Нет
+            <input id="rent_repair" type="checkbox">
+            <span class="lever"></span>
+            Да
+          </label>
+        </div>
+      </div>
+      </div> <!-- end of row -->
+
+
+  </div>
+  <div class="modal-footer">
+    <button onclick="createNewForm()" class="btn modal-close waves-effect light-blue" id="create_new_form">Создать форму ремонта</button>
+    <button class="btn modal-close waves-effect grey">Отменить</button>
+  </div>
+</div>
