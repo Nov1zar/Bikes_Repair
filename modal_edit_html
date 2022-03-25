@@ -1,0 +1,57 @@
+<div id="modal2" class="modal modal-fixed-footer">
+  <div class="modal-content">
+    <div class="row">
+      <h3 id="gears_id_edit" data-gears-id></h3>
+      
+    </div>
+    
+    <p>Заполни информацию о детале: название, сколько что стоит, обязательно укажи тип велосипеда, и входит ли данная запчасть в бесплатный ремонт по ТО.
+      Когда закончишь, нажми добавить запчасть внизу окна
+    </p>
+    
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="gears_name_edit" type="text" class="validate">
+        <label class="active" for="gears_name">Название запчасти</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="gears_price_edit" type="text" class="validate">
+        <label class="active" for="gears_price">Стоимость запчасти</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="gears_work_edit" type="text" class="validate">
+        <label class="active" for="gears_work">Стоимость работ</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s6"><p>Тип велосипеда:</p>
+        <div class="switch">
+          <label>
+            Педальный
+            <input id="gears_type_edit"type="checkbox">
+            <span class="lever"></span>
+            Электрический
+          </label>
+        </div>
+      </div>
+      <div class="col s6"><p>Входит в ТО?</p>
+        <div class="switch" >
+          <label>
+            Нет
+            <input id="gears_repair_rent_edit" type="checkbox" >
+            <span class="lever"></span>
+            Да
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn modal-close waves-effect light-blue" id="saveChanges">Сохранить изменения</button>
+    <button class="btn modal-close waves-effect grey">Закрыть</button>
+  </div>
+</div>
