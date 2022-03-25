@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?!= include("head_html"); ?>
+</head>
+
+  <body>
+      <div>
+        <ul id="slide-out" class="sidenav">
+          <!-- <li><a href="https://admin.localkitchen.ru/" target="_blank" rel="noopener noreferrer">Перейти в админку</a></li> -->
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=dash" id="dash">Дашборд ремонта</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=" id="library">Справочник Запчастей</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=about" id="about">Скоротать время</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=repair_index" id="repair_index">Формы Ремонта</a></li>
+
+        </ul>
+        <a href="" data-target="slide-out" class="sidenav-trigger "><i class="medium material-icons">menu</i></a>
+      </div>   
+      
+      <div class="container">
+        <h1>Справочник запчастей</h1>
+        <div class="row">
+          <div class="input-field col s6">
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+            <input placeholder="&#xF002; Поищи деталь по названию..." id="search" onkeyup="searchTable()" type="text" class="validate" style="font-family:Arial, FontAwesome"/>
+          </div>
+          <div class="input-field col s3">
+            <i class="material-icons prefix">tune</i>
+            <select id="gears_type_selector" class="active">
+              <option>Все вместе</option>
+              <option>Педальный</option>
+              <option>Электрический</option>
+            </select>
+            <label for="gear_type">Выбери тип запчасти</label>
+          </div>
+          <div class="col s3">
+            
+              <button data-target="modal1" class="btn modal-trigger light-blue" id = "addbutton">Добавить новую<i class="material-icons left">add</i></button>
+
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="progress" id="preloader">
+            <div class="indeterminate"></div>
+          </div>
+        </div>
+        <div id="dataTable" class="table-responsive">
+          <table class="highlight" id="searchResults">
+          <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Название детали</th>
+                <th scope="col">Тип детали</th>
+                <th scope="col">Входит в ТО?</th>
+                <th scope="col">Цена детали</th>
+                <th scope="col">Цена работы</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+          </thead>
+
+          <tbody id="loadTable">
+          </tbody>
+        </table>
+            
+      </div> <!-- End container -->
+
+
+    <?!= include("modal_addnew"); ?>
+    <?!= include("modal_edit"); ?>
+    <?!= include("menu_html"); ?>
+    <?!= include("style_css"); ?>
+    <?!= include("library_js"); ?>
+  
+  
+  <template id="rowTemplate">
+    <tr class="tableRows">
+      <th class="gears_id" scope="row"></th>
+      <td class="gears_name"></td>
+      <td class="gears_type"></td>
+      <td class="gears_repair_rent"></td>
+      <td class="gears_price"></td>
+      <td class="gears_work"></td>
+      <td><button data-target="modal2" class="btn waves-effect light-blue edit-button modal-trigger" id = "edit"><i class="material-icons center edit-icon">mode_edit</i></button></td>
+      <td><button class="btn waves-effect red delete-button" id = "delete"><i class="material-icons center delete-icon">delete_forever</i></button></td>
+    </tr>
+
+  </template>
+  
+  <div id="loading" class="loading">
+  <div class="loader">
+    <div class="inner one"></div>
+    <div class="inner two"></div>
+    <div class="inner three"></div>
+  </div>
+</div>
+  
+  </body>
+
+</html>
