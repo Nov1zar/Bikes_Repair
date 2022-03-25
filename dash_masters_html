@@ -1,0 +1,23 @@
+        <div class="row col s12" id="dash_masters">
+          <div class="row">
+            <div class="input-field col s12">
+              <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+              <input placeholder="&#xF002; Поищи по ФИО мастера" id="master_search" onkeyup="searchByMaster()" type="text" class="validate" style="font-family:Arial, FontAwesome"/>
+            </div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                  <th>Мастер</th>
+                  <th>Педальные Количество</th>
+                  <th>Педальные сумма</th>
+                  <th>Электрические Количество</th>
+                  <th>Электрические сумма</th>
+                  <th>Итого отремонтировал</th>
+                  <th>Итого сумма</th>
+              </tr>
+            </thead>
+            <tbody id="dash_masters_body"></tbody>
+          </table>
+        </div>
