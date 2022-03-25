@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?!= include("head_html"); ?>
+</head>
+
+  <body>
+      <div>
+        <ul id="slide-out" class="sidenav">
+          <!-- <li><a href="https://admin.localkitchen.ru/" target="_blank" rel="noopener noreferrer">Перейти в админку</a></li> -->
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=dash" id="dash">Дашборд ремонта</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=" id="library">Справочник Запчастей</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=about" id="about">Скоротать время</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=repair_index" id="repair_index">Формы Ремонта</a></li>
+
+        </ul>
+        <a href="" data-target="slide-out" class="sidenav-trigger "><i class="medium material-icons">menu</i></a>
+      </div>   
+    <?!= include("head_html"); ?>
+    <?!= include("menu_html"); ?>
+    <?!= include("style_css"); ?>
+    <?!= include("repair_index_js"); ?>
+    <?!= include("modal_createform"); ?>
+    <?!= include("modal_createform_js"); ?>
+    <?!= include("tabs_js"); ?>
+    
+    <div class="row">
+      <h3 class="col s12">Формы ремонта</h3>
+      <div class="row">
+      <div class="col s4 dash_info">
+      <div><h8 id="dash_total_created">Сейчас в работе: </h8></div>
+      <div><h8 id="dash_total_completed">Ожидают оплаты: </h8></div>
+      <div><h8 id="dash_total_payed">Подтвреждена оплата: </h8></div>
+      </div>
+      <div class="col s4 dash_info">
+      <div><h8 id="dash_total_repaired_mechanical">Отремонтировано педальных: </h8></div>
+      <div><h8 id="dash_total_mechanical_company">Принадлежат компании: </h8></div>
+      <div><h8 id="dash_total_mechanical_riders">Принадлежат райдерам: </h8></div>
+      </div>
+      <div class="col s4 dash_info">
+      <div><h8 id="dash_total_repaired_electrical">Отремонтировано электрических: </h8></div>
+      <div><h8 id="dash_total_electrical_company">Принадлежат компании: </h8></div>
+      <div><h8 id="dash_total_electrical_riders">Принадлежат райдерам: </h8></div>
+      </div>
+      </div>    
+      
+      <button  data-target="modal3" class="btn modal-trigger light-blue" id = "create_form">Форма ремонта<i class="material-icons left">add</i></button>
+    </div>
+
+
+    <div class="row">
+      <div class="input-field col s8">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+        <input placeholder="&#xF002; Поищи форму ремонта по ФИО Райдера или по номеру байка" id="search" onkeyup="searchTable()" type="text" class="validate" style="font-family:Arial, FontAwesome"/>
+      </div>
+       <div class="input-field col s4">
+          <i class="material-icons prefix">tune</i>
+          <select id="form_status_selector" class="active">
+            <option>Все вместе</option>
+            <option>Создана</option>
+            <option>Подтверждена</option>
+            <option>Оплачена</option>
+          </select>
+          <label for="stufftype">Выбери статус форм</label>
+        </div>
+    </div>
+
+    <div class="row">
+      <div class="progress" id="preloader">
+        <div class="indeterminate"></div>
+      </div>
+    </div>
+
+      <div class="row">
+        <div id="form_created" class="table-responsive col s12">
+              <table class="highlight" id="ResultsForIndexRepair">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Номер <br> велосипеда</th>
+                    <th scope="col">Мастер <br> по ремонту</th>
+                    <th scope="col">Тип <br> велосипеда</th>
+                    <th scope="col">Владелец <br> велосипеда</th>
+                    <th scope="col">Статус <br> Аренды</th>
+                    <th scope="col">Ремонт по ТО</th>
+                    <th scope="col">ФИО <br> Райдера</th>
+                    <th scope="col">Сумма <br> ремонта</th>
+                    <th scope="col">Создали</th>
+                    <th scope="col">Подтвердили</th>
+                    <th scope="col">Оплатили</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                  <tbody id="loadIndexRepairTable"> </tbody>
+                  
+              </table>
+
+        </div> <!-- END dataTable -->
+        </div> <!-- END row -->
+        
+
+        <template id="indexRepairTemplate">
+          <tr class="tableRows">
+            <th class="form_id" scope="row"></th>
+            <td class="form_status"></td>
+            <td class="bike_id"></td>
+            <td class="assigned_worker"></td>
+            <td class="bike_type"></td>
+            <td class="bike_owner"></td>
+            <td class="bike_rent"></td>
+            <td class="rent_repair"></td>
+            <td class="rider_name"></td>
+            <td class="repair_amount"></td>
+            <td class="form_created_at"></td>
+            <td class="form_completed_at"></td>
+            <td class="form_approved_at"></td>
+            <td>
+              <a class="formlink" id="showlink" href = '<?= ScriptApp.getService().getUrl() ?>?v=repair_form'>
+                <button class="btn waves-effect waves-light light-blue show-form-button" id="showform" type="submit">
+                  <i class="material-icons center show-form-icon">visibility</i>  
+                </button>
+              </a>
+            </td>
+            <td><button class="btn waves-effect waves-light red delete-form-button" id = "delete_form" disabled><i class="material-icons center delete-form-icon">delete_forever</i></button></td>
+          </tr>
+        </template>
+
+
+<div id="loading" class="loading">
+  <div class="loader">
+    <div class="inner one"></div>
+    <div class="inner two"></div>
+    <div class="inner three"></div>
+  </div>
+</div>
+
+
+        </body>
+        
+
+</html>
