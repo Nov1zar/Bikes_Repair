@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+
+    
+    <div>
+        <ul id="slide-out" class="sidenav">
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=dash" id="dash">Дашборд ремонта</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=" id="library">Справочник Запчастей</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=about" id="about">Скоротать время</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=repair_index" id="repair_index">Формы Ремонта</a></li>
+
+        </ul>
+        <a href="" data-target="slide-out" class="sidenav-trigger "><i class="medium material-icons">menu</i></a>
+      </div>   
+      <div class="container">
+        <div class="row" id="dashboard">
+          <h3>Дашборд ремонта</h3>
+        </div>
+
+          <div class="row">
+            <div class="input-field col s2">
+              <i class="material-icons prefix">date_range</i>
+              <input id="datepicker_from" type="text" class="datepicker">
+            </div>
+            <div class="input-field col s2">
+              <i class="material-icons prefix">date_range</i>
+              <input id="datepicker_to" type="text" class="datepicker">
+            </div>
+            <div class="col s2">
+            <button class="btn waves-effect waves-light" id = "dash_main_butn">Применить
+              <i class="material-icons right">chevron_right</i>
+            </button>
+            </div>
+          </div>
+
+        <div class="row">
+        <div class="col s12">
+          <ul class="tabs">
+            <li class="tab col s3"><a class="active" href="#dash_main">Общий</a></li>
+            <li class="tab col s3"><a class="active" href="#dash_bikes">По байкам</a></li>
+            <li class="tab col s3"><a class="active" href="#dash_masters">По мастерам</a></li>
+            <li class="tab col s3"><a class="active" href="#dash_gears">По запчастям</a></li>
+          </ul>
+        </div>
+        </div>
+
+<div id="loading" class="loading">
+  <div class="loader">
+    <div class="inner one"></div>
+    <div class="inner two"></div>
+    <div class="inner three"></div>
+  </div>
+</div>
+
+
+
+
+
+
+    <?!= include("dash_main"); ?>
+    <?!= include("dash_bikes"); ?>
+    <?!= include("dash_masters"); ?>
+    <?!= include("dash_gears"); ?>
+    <?!= include("head_html"); ?>
+    <?!= include("menu_html"); ?>
+    <?!= include("style_css"); ?>
+    <?!= include("dash_js"); ?>
+    <?!= include("tabs_js"); ?>
+    <?!= include("datepicker_js"); ?>
+  </body>
+</html>
