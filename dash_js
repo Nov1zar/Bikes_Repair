@@ -1,0 +1,303 @@
+<script>
+
+
+    const numBit = (item) => {
+    const numData = item
+    return  numData  > 0 ? Number(numData).toLocaleString()+" ₽" : ""
+    }
+
+
+          document.addEventListener('DOMContentLoaded', function() {
+          var elems = document.querySelectorAll('select');
+          var instances = M.FormSelect.init(elems);
+
+          const preloader = document.getElementById("preloader")
+          const loading = document.getElementById('loading')
+          preloader.style.display = "block"
+          loading.style.display = "block"
+
+          google.script.run.withSuccessHandler(function(){
+            M.toast({html: 'Крутим шестеренки, чтобы у тебя были все данные!'});
+            google.script.run.withSuccessHandler(generateMainDashboard).getMainDashInfo()
+            google.script.run.withSuccessHandler(generateMastersDashboard).getMastersDashInfo()
+            google.script.run.withSuccessHandler(generateBikesDashboard).getBikesDashInfo()
+            google.script.run.withSuccessHandler(generateGearsDashboard).getGearsDashInfo()
+          }).setDefaultDates()
+          
+          })
+
+
+
+  document.getElementById("dash_main_butn").addEventListener('click',updatePickedPeriod)
+
+  function updatePickedPeriod(){
+    preloader.style.display = "block"
+    loading.style.display = "block"
+    var dateInfo ={
+      from_date: document.getElementById("datepicker_from").value,
+      to_date: document.getElementById("datepicker_to").value
+    }
+    console.log(new Date(dateInfo.from_date), new Date(dateInfo.from_date))
+    if (Date.parse(dateInfo.from_date) > Date.parse(dateInfo.from_date)){
+      M.toast({html: 'Похоже что выбран неправильный период'});
+      preloader.style.display = "none"
+      loading.style.display = "none"  
+    }else{
+    M.toast({html: 'Крутим шестеренки, чтобы у тебя были все данные!'});
+
+      google.script.run.withSuccessHandler(function(){
+        google.script.run.withSuccessHandler(generateMainDashboard).getMainDashInfo()
+        google.script.run.withSuccessHandler(generateMastersDashboard).getMastersDashInfo()
+        google.script.run.withSuccessHandler(generateBikesDashboard).getBikesDashInfo()
+        google.script.run.withSuccessHandler(generateGearsDashboard).getGearsDashInfo()
+      }).updateDates(dateInfo)
+  }
+
+  }
+
+
+function generateMastersDashboard(data){
+  
+  var mbody = document.getElementById("dash_masters_body");
+  // console.log(data)
+  mbody.innerHTML = ""
+  data.forEach(function(r){
+
+  var row = document.createElement("tr");
+  var col1 = document.createElement("td");
+  var col2 = document.createElement("td");
+  var col3 = document.createElement("td");
+  var col4 = document.createElement("td");
+  var col5 = document.createElement("td");
+  var col6 = document.createElement("td");
+  var col7 = document.createElement("td");
+
+  col1.textContent = r[0];
+  col2.textContent = r[1];
+  col3.textContent = numBit(r[3]);
+  col4.textContent = r[2];
+  col5.textContent = numBit(r[4]);
+  col6.textContent = r[5];
+  col7.textContent = numBit(r[6]);
+
+  row.appendChild(col1);
+  row.appendChild(col2);
+  row.appendChild(col3);
+  row.appendChild(col4);
+  row.appendChild(col5);
+  row.appendChild(col6);
+  row.appendChild(col7);
+
+  mbody.appendChild(row);
+  });
+
+
+}
+
+
+
+function generateMainDashboard(dataArray){
+  
+  
+  var dbody = document.getElementById("dash_main_body");
+  // console.log(dataArray)
+
+  dbody.innerHTML = ""
+  dataArray.forEach(function(r){
+
+  var row = document.createElement("tr");
+  var col1 = document.createElement("td");
+  var col2 = document.createElement("td");
+  var col3 = document.createElement("td");
+  var col4 = document.createElement("td");
+  var col5 = document.createElement("td");
+  var col6 = document.createElement("td");
+  var col7 = document.createElement("td");
+
+  col1.textContent = r[0];
+  col2.textContent = r[1];
+  col3.textContent = numBit(r[2]);
+  col4.textContent = r[3];
+  col5.textContent = numBit(r[4]);
+  col6.textContent = r[5];
+  col7.textContent = numBit(r[6]);
+
+  row.appendChild(col1);
+  row.appendChild(col2);
+  row.appendChild(col3);
+  row.appendChild(col4);
+  row.appendChild(col5);
+  row.appendChild(col6);
+  row.appendChild(col7);
+
+  dbody.appendChild(row);
+  });
+  preloader.style.display = "none"
+  loading.style.display = "none"
+  
+}
+</script>
+
+<script>
+  
+
+
+function generateGearsDashboard(dataArray){
+  
+  
+  var gbody = document.getElementById("dash_gears_body");
+  // console.log(dataArray)
+
+  gbody.innerHTML = ""
+  dataArray.forEach(function(r){
+
+  var row = document.createElement("tr");
+  var col1 = document.createElement("td");
+  var col2 = document.createElement("td");
+  var col3 = document.createElement("td");
+  var col4 = document.createElement("td");
+  var col5 = document.createElement("td");
+  var col6 = document.createElement("td");
+  var col7 = document.createElement("td");
+
+  col1.textContent = r[0];
+  col2.textContent = r[3];
+  col3.textContent = numBit(r[5]);
+  col4.textContent = numBit(r[6]);
+  col5.textContent = numBit(r[7]);
+  col6.textContent = r[1];
+  col7.textContent = numBit(r[2]);
+
+  row.appendChild(col1);
+  row.appendChild(col2);
+  row.appendChild(col3);
+  row.appendChild(col4);
+  row.appendChild(col5);
+  row.appendChild(col6);
+  row.appendChild(col7);
+
+  gbody.appendChild(row);
+  });
+
+  
+}
+
+
+  
+  
+
+  function generateBikesDashboard(bData){
+  
+  var bbody = document.getElementById("dash_bikes_body");
+  bbody.innerHTML = ""
+  // console.log(bData)
+
+  bData.forEach(function(r){
+
+  var row = document.createElement("tr");
+  var col1 = document.createElement("td");
+  var col2 = document.createElement("td");
+  var col3 = document.createElement("td");
+  var col4 = document.createElement("td");
+  var col5 = document.createElement("td");
+
+
+  col1.textContent = r[0];
+  col2.textContent = r[3];
+  col3.textContent = r[1];
+  col4.textContent = r[4];
+  col5.textContent = numBit(r[2]);
+
+
+  row.appendChild(col1);
+  row.appendChild(col2);
+  row.appendChild(col3);
+  row.appendChild(col4);
+  row.appendChild(col5);
+
+
+  bbody.appendChild(row);
+  });
+
+}
+
+
+
+
+
+function searchByBikeID() {
+  var input, filter, table, tr, td, td1, i, txtValue;
+  input = document.getElementById("bike_search");
+  filter = input.value.toLowerCase();
+  table = document.getElementById("dash_bikes_body");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0]; 
+    
+    
+    if (td) {
+      firstCol = td.textContent;
+  
+      if (firstCol.toLowerCase().indexOf(filter) > -1 ) {        
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+
+function searchByMaster() {
+  var input, filter, table, tr, td, td1, i, txtValue;
+  input = document.getElementById("master_search");
+  filter = input.value.toLowerCase();
+  table = document.getElementById("dash_masters_body");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0]; 
+    
+    
+    if (td) {
+      firstCol = td.textContent;
+  
+      if (firstCol.toLowerCase().indexOf(filter) > -1 ) {        
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+
+function searchGearsDash() {
+  var input, filter, table, tr, td, td1, i, txtValue;
+  input = document.getElementById("search_gears");
+  filter = input.value.toLowerCase();
+  table = document.getElementById("dash_gears_body");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0]; 
+    
+    
+    if (td) {
+      firstCol = td.textContent;
+  
+      if (firstCol.toLowerCase().indexOf(filter) > -1 ) {        
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+
+
+
+
+
+</script>
+
+
