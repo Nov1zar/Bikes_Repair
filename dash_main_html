@@ -1,0 +1,27 @@
+        <div class="row col s12" id="dash_main">
+          
+
+
+    <div class="row">
+      <div class="progress col s12" id="preloader" >
+        <div class="indeterminate"></div>
+      </div>
+    </div>
+    
+
+          <table>
+            <thead>
+              <tr>
+                  <th>Владелец</th>
+                  <th>Количество электро</th>
+                  <th>Стоимость электро</th>
+                  <th>Количество педальных</th>
+                  <th>Стоимость педальных</th>
+                  <th>Итого отремонтировано</th>
+                  <th>Итого стоимость</th>
+              </tr>
+            </thead>
+            <tbody id="dash_main_body"></tbody>
+          </table>
+          
+        </div>
