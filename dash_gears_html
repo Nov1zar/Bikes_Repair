@@ -1,0 +1,24 @@
+        <div class="row col s12" id="dash_gears">
+          <div class="row">
+            <div class="input-field col s8">
+              <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+              <input placeholder="&#xF002; Поищи по названию детали" id="search_gears" onkeyup="searchGearsDash()" type="text" class="validate" style="font-family:Arial, FontAwesome"/>
+            </div>
+
+          </div>
+          <table>
+            <thead>
+              <tr>
+                  <th>Название запчасти</th>
+                  <th>Тип</th>
+                  <th>Цена детали</th>
+                  <th>Цена работы</th>
+                  <th>Итого за запчасть</th>
+                  <th>Использовали раз</th>
+                  <th>Итоговая стоимость</th>
+              </tr>
+            </thead>
+            <tbody id="dash_gears_body">
+            </tbody>
+          </table>
+        </div>
