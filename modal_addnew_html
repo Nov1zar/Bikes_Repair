@@ -1,0 +1,55 @@
+<div id="modal1" class="modal modal-fixed-footer">
+  <div class="modal-content">
+    <h4>Добавить новую запчасть</h4>
+    <p>Заполни информацию о детале: название, сколько что стоит, обязательно укажи тип велосипеда, и входит ли данная запчасть в бесплатный ремонт по ТО.
+      Когда закончишь, нажми добавить запчасть внизу окна
+    </p>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="gears_name" type="text" class="validate" required>
+        <label for="gears_name">Укажи название запчасти</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="gears_price" type="text" class="validate">
+        <label for="gears_price">Укажи стоимость запчасти</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="gears_work" type="text" class="validate">
+        <label for="gears_work">Укажи стоимость работ</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s6" id=><p>Тип велосипеда:</p>
+        <div class="switch" >
+          <label>
+            Педальный
+            <input class="switcher" id="gears_type"type="checkbox">
+            <span class="lever"></span>
+            Электрический
+          </label>
+        </div>
+      </div>
+      <div class="col s6"><p>Входит в ТО?</p>
+        <div class="switch">
+          <label>
+            Нет
+            <input id="gears_repair_rent" style="height: 60px; width: 100px" type="checkbox" >
+            <span class="lever"></span>
+            Да
+          </label>
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button onclick="addNewGear()" class="btn modal-close waves-effect light-blue" id="add_new_button">Добавить запчасть</button>
+    <button class="btn modal-close waves-effect grey">Закрыть</button>
+  </div>
+</div>
