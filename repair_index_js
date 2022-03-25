@@ -1,0 +1,360 @@
+<script>
+    
+    const statuses = {
+    created: "Создана",
+    completed: "Подтверждена",
+    payed: "Оплачена"
+    }
+
+    const numBit = (item) => {
+    const numData = item
+    return  numData  > 0 ? Number(numData).toLocaleString()+" ₽" : ""
+    }
+
+    
+
+    
+    var data;
+    document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems,{dismissible: false});
+    const preloader = document.getElementById("preloader")
+    const loading = document.getElementById("loading")
+    google.script.run.withSuccessHandler(loadIndexRepair).getDataForIndex();
+    // google.script.run.withSuccessHandler(loadDashInfo).getDashInfo()
+    document.getElementById("loadIndexRepairTable").addEventListener('click',clickEventHandler)
+    document.getElementById("form_status_selector").addEventListener('change',filterTable)
+    var elements = document.querySelectorAll('select');
+    var instances1 = M.FormSelect.init(elements);
+    
+    google.script.run.withSuccessHandler(updateListOfMasters).getListOfMasters()
+  });
+
+
+
+
+
+  function updateListOfMasters(listOfMasters){
+    // console.log(listOfMasters)
+    var elements = document.querySelectorAll('select');
+
+      var list = document.getElementById('assigned_worker')
+      
+      for (var i=0; i<listOfMasters.length; i++) {
+        var test = document.createElement("option")
+        test.textContent = listOfMasters[i]
+        list.append(test);
+       
+    }
+    var instances = M.FormSelect.init(elements)
+  }
+
+//   function fillMaterializeSelect(elSelect, data) {
+
+//     elSelect.options.length = 0;
+
+//     for (let i = 0; i < data.length; i++) {
+
+//       const dataElement = data[i];
+
+//       const option = document.createElement("option");
+//       option.value = dataElement.value;
+//       option.text = dataElement.text;
+//       elSelect.add(option);
+
+//     }
+
+//     M.FormSelect.init(elSelect);
+
+// }
+
+
+
+
+
+
+
+
+
+
+  
+  function createNewForm(){
+
+    loading.style.display = "block"
+    preloader.style.display = "block"
+    var formInfo ={}
+    formInfo.bikeID = document.getElementById('bike_id').value
+    formInfo.assignedWorker = document.getElementById('assigned_worker').value
+    formInfo.riderName = document.getElementById("rider_name").value
+
+    document.getElementById("bike_owner").checked == true ?  formInfo.bikeOwner = "Компания" : formInfo.bikeOwner = "Райдер"
+    document.getElementById("bike_type").checked == true ?  formInfo.bikeType = "Электрический" : formInfo.bikeType = "Педальный"
+    document.getElementById("bike_rent").checked == true ? formInfo.bikeRent = "В аренде" : formInfo.bikeRent = "Не в Аренде"
+    document.getElementById("rent_repair").checked == true ? formInfo.rentRepair = "Да" : formInfo.rentRepair = "Нет"
+
+    formInfo.repairAmount = 0
+    if(formInfo.bikeID == "" || formInfo.riderName == "" || formInfo.assignedWorker == ""){
+      M.toast({html: 'Номер байка, ФИО райдера и Мастер по должны быть заполнены'})
+      google.script.run.withSuccessHandler(loadIndexRepair).getDataForIndex();
+        document.getElementById('bike_id').value = ""
+        document.getElementById("rider_name").value = ""
+        document.getElementById('assigned_worker').selectedIndex = 0;
+        document.getElementById("bike_type").checked = false
+        document.getElementById("bike_owner").checked = false
+        document.getElementById("bike_rent").checked = false
+        document.getElementById("rent_repair").checked = false
+        M.updateTextFields()
+        M.FormSelect.init(document.getElementById('assigned_worker'));
+    } else{
+        google.script.run.withSuccessHandler(function(){
+        google.script.run.withSuccessHandler(loadIndexRepair).getDataForIndex();
+        M.toast({html: 'Создаем новую форму'})
+        // console.log(formInfo)
+
+
+        document.getElementById('bike_id').value = ""
+        document.getElementById("rider_name").value = ""
+        document.getElementById('assigned_worker').selectedIndex = 0;
+        document.getElementById("bike_type").checked = false
+        document.getElementById("bike_owner").checked = false
+        document.getElementById("bike_rent").checked = false
+        document.getElementById("rent_repair").checked = false
+        M.updateTextFields()
+        M.FormSelect.init(document.getElementById('assigned_worker'));
+        
+      }).addNewForm(formInfo)}
+    
+  }
+
+
+
+
+
+
+  function loadDashInfo(dashInfo){
+    var dash ={
+      total_payed_count: dashInfo.filter(function(el){return el.form_status == "Оплачена"}),
+      total_created_count: dashInfo.filter(function(el){return el.form_status ==  "Создана"}),
+      total_completed_count: dashInfo.filter(function(el){return el.form_status == "Подтверждена"}),
+      total_repaired_electrical: dashInfo.filter(function(el){if (el.form_status == "Оплачена" && el.bike_type == "Электрический"){return true}}),
+      total_electrical_company: dashInfo.filter(function(el){if (el.form_status == "Оплачена" && el.bike_type == "Электрический" && el.bike_owner == "Компания"){return true}}),
+      total_electrical_riders: dashInfo.filter(function(el){if (el.form_status == "Оплачена" && el.bike_type == "Электрический" && el.bike_owner == "Райдер"){return true}}),
+      total_repaired_mechanical: dashInfo.filter(function(el){if (el.form_status == "Оплачена" && el.bike_type == "Педальный"){return true}}),
+      total_mechanical_company: dashInfo.filter(function(el){if (el.form_status == "Оплачена" && el.bike_type == "Педальный" && bike_owner == "Компания"){return true}}),
+      total_mechanical_riders: dashInfo.filter(function(el){if (el.form_status == "Оплачена" && el.bike_type == "Педальный" && el.bike_owner == "Райдер"){return true}}),
+
+    }
+ 
+    var total_repair_amount = dash.total_payed_count.reduce((a, {total_amount}) => a + total_amount, 0)
+    var total_electrical_amount = dash.total_repaired_electrical.reduce((a, {total_amount}) => a + total_amount, 0)
+    var total_electrical_company_amount = dash.total_electrical_company.reduce((a, {total_amount}) => a + total_amount, 0)
+    var total_electrical_riders_amount = dash.total_electrical_riders.reduce((a, {total_amount}) => a + total_amount, 0)
+    var total_mechanical_amount = dash.total_repaired_mechanical.reduce((a, {total_amount}) => a + total_amount, 0)
+    var total_mechanical_company_amount = dash.total_mechanical_company.reduce((a, {total_amount}) => a + total_amount, 0)
+    var total_mechanical_riders_amount = dash.total_mechanical_riders.reduce((a, {total_amount}) => a + total_amount, 0)
+  }
+
+
+
+
+
+
+
+  function loadIndexRepair(arrayData){
+
+    preloader.style.display = 'block'
+
+    var indexArray = document.getElementById("loadIndexRepairTable");
+    indexArray.innerHTML = "";
+    var templateBox = document.getElementById("indexRepairTemplate");
+    var template = templateBox.content;
+    
+
+
+    arrayData.forEach(function(r){
+      
+      var tr = template.cloneNode(true);
+      var form_id_column = tr.querySelector(".form_id");
+      var form_status_column = tr.querySelector(".form_status");
+      var bike_id_column = tr.querySelector(".bike_id");
+      var assigned_worker_column = tr.querySelector(".assigned_worker")
+      var bike_type_column = tr.querySelector(".bike_type");
+      var bike_owner_column = tr.querySelector(".bike_owner");
+      var bike_rent_column = tr.querySelector(".bike_rent");
+      var rent_repair_column = tr.querySelector(".rent_repair")
+      var rider_name_column = tr.querySelector(".rider_name");
+      var repair_amount_column = tr.querySelector(".repair_amount");
+      var form_created_at_column = tr.querySelector(".form_created_at");
+      var form_completed_at_column = tr.querySelector(".form_completed_at");
+      var form_approved_at_column = tr.querySelector(".form_approved_at");
+      var showButton = tr.querySelector(".show-form-button");
+      var showIcon = tr.querySelector(".show-form-icon");
+      var deleteButton = tr.querySelector(".delete-form-button");
+      var deleteIcon = tr.querySelector(".delete-form-icon");
+      var formlink = tr.querySelector(".formlink");
+      var els = tr.querySelector("tr");
+      var td = tr.querySelectorAll("td");
+      
+      form_id_column.textContent = r[0];
+      showButton.dataset.formID = r[0];
+      showIcon.dataset.formID = r[0];
+      
+      deleteIcon.dataset.formID = r[0];
+      deleteButton.dataset.formID = r[0];
+
+      form_status_column.textContent = r[1];
+      bike_id_column.textContent = r[2];
+      assigned_worker_column.textContent = r[3];
+      bike_type_column.textContent = r[4];
+      bike_owner_column.textContent = r[5];
+      bike_rent_column.textContent = r[6];
+      rent_repair_column.textContent = r[7]
+      rider_name_column.textContent = r[8];
+      repair_amount_column.textContent = r[9] +"₽";
+      form_created_at_column.textContent = r[10];
+      form_completed_at_column.textContent = r[11];
+      form_approved_at_column.textContent = r[12];
+
+      indexArray.appendChild(tr);
+      var form_id_link = showButton.dataset.formID
+      formlink.href += `&id=${form_id_link}`
+      
+
+      
+
+      switch (form_status_column.textContent){
+        case statuses.completed:
+        deleteButton.disabled = true
+        els.classList.add("completed")
+        break;
+        case statuses.payed:
+        deleteButton.disabled = true        
+        els.classList.add("payed")
+        break;
+        case statuses.created:
+        deleteButton.disabled = false
+        break;
+      }
+      
+
+      
+
+    });
+
+
+
+      var dash ={
+      total_created_count: arrayData.filter(function(el){return el[1] == "Создана"}),
+      total_completed_count: arrayData.filter(function(el){return el[1] == "Подтверждена"}),
+      total_payed_count: arrayData.filter(function(el){return el[1] == "Оплачена"}),
+      total_repaired_electrical: arrayData.filter(function(el){if (el[1] == "Оплачена" && el[4]== "Электрический"){return true}}),
+      total_electrical_company: arrayData.filter(function(el){if (el[1] == "Оплачена" && el[4] == "Электрический" && el[5] == "Компания"){return true}}),
+      total_electrical_riders: arrayData.filter(function(el){if (el[1] == "Оплачена" && el[4] == "Электрический" && el[5]  == "Райдер"){return true}}),
+      total_repaired_mechanical: arrayData.filter(function(el){if (el[1] == "Оплачена" && el[4] == "Педальный"){return true}}),
+      total_mechanical_company: arrayData.filter(function(el){if (el[1] == "Оплачена" && el[4] == "Педальный" && el[5] == "Компания"){return true}}),
+      total_mechanical_riders: arrayData.filter(function(el){if (el[1] == "Оплачена" && el[4] == "Педальный" && el[5] == "Райдер"){return true}}),
+      }
+
+
+      document.getElementById("dash_total_created").innerHTML = "Сейчас в работе: " + dash.total_created_count.length
+      document.getElementById("dash_total_completed").innerHTML = "Ожидают оплаты: " + dash.total_completed_count.length
+      document.getElementById("dash_total_payed").innerHTML = "Подтвреждена оплата: " + dash.total_payed_count.length
+      
+      document.getElementById("dash_total_repaired_mechanical").innerHTML = "Отремонтировано педальных: " + dash.total_repaired_mechanical.length
+      document.getElementById("dash_total_mechanical_company").innerHTML =  "Принадлежит компании: " + dash.total_mechanical_company.length
+      document.getElementById("dash_total_mechanical_riders").innerHTML = "Принадлежат райдерам: " + dash.total_mechanical_riders.length
+      document.getElementById("dash_total_repaired_electrical").innerHTML = "Отремонтировано электрических: " + dash.total_repaired_electrical.length
+      document.getElementById("dash_total_electrical_company").innerHTML = "Принадлежат компании: " + dash.total_electrical_company.length
+      document.getElementById("dash_total_electrical_riders").innerHTML = "Принадлежат райдерам: " + dash.total_electrical_riders.length
+
+
+        loading.style.display = "none"
+        preloader.style.display = "none"
+
+
+        
+
+
+  }
+
+  function deleteFormById(e){
+    loading.style.display = "block"
+    preloader.style.display = "block"
+    var form_ID = e.target.dataset.formID    
+    google.script.run.withSuccessHandler(function(){
+    google.script.run.withSuccessHandler(loadIndexRepair).getDataForIndex()
+    e.target.closest(".tableRows").remove()
+    M.toast({html: 'Удалили форму из списка'})
+    loading.style.display = "none"
+    preloader.style.display = "none"
+    
+  }).deleteFormID(form_ID)
+  }
+
+
+  function clickEventHandler(e){
+  if (e.target.matches(".delete-form-button") || e.target.matches(".delete-form-icon")){
+    var sign = prompt('Удалится вся работа которая была проделана по форме ремонта, если уверен → введи пароль') 
+      if (sign.toLowerCase() == "admin"){
+        deleteFormById(e)
+      }else{
+        M.toast({html: 'Неправильный пароль'})
+      }
+    }
+  }
+
+
+
+function searchTable() {
+  var input, filter, table, tr, td, td1, i, txtValue;
+  input = document.getElementById("search");
+  filter = input.value.toLowerCase();
+  table = document.getElementById("loadIndexRepairTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[7]; 
+    td1 = tr[i].getElementsByTagName("td")[1];
+    
+    if (td) {
+      firstCol = td.textContent;
+      secondCol = td1.textContent;
+      if (firstCol.toLowerCase().indexOf(filter) > -1 || secondCol.toLowerCase().indexOf(filter) > -1 ) {        
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+
+function filterTable() {
+  // Variables
+  let dropdown, table, rows, cells, country, filter;
+  dropdown = document.getElementById("form_status_selector");
+  table = document.getElementById("loadIndexRepairTable");
+  rows = table.getElementsByTagName("tr");
+  filter = dropdown.value;
+
+  // Loops through rows and hides those with countries that don't match the filter
+  for (let row of rows) { // `for...of` loops through the NodeList
+    cells = row.getElementsByTagName("td");
+    country = cells[0] || null; // gets the 2nd `td` or nothing
+    // if the filter is set to 'All', or this is the header row, or 2nd `td` text matches filter
+    if (filter === "Все вместе" || !country || (filter === country.textContent)) {
+      row.style.display = ""; // shows this row
+    }
+    else {
+      row.style.display = "none"; // hides this row
+    }
+  }
+}
+
+  
+
+
+
+  
+
+
+</script>
