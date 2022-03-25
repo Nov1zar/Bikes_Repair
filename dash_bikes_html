@@ -1,0 +1,20 @@
+        <div class="row col s12" id="dash_bikes">
+          <div class="row">
+            <div class="input-field col s12">
+              <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+              <input placeholder="&#xF002; Поищи по номеру байка" id="bike_search" onkeyup="searchByBikeID()" type="text" class="validate" style="font-family:Arial, FontAwesome"/>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                  <th>Номер велосипеда</th>
+                  <th>Тип</th>
+                  <th>Отремонтировали раз</th>
+                  <th>Использовали запчастей</th>
+                  <th>Стоимость ремонта</th>
+              </tr>
+            </thead>
+            <tbody id="dash_bikes_body"></tbody>
+          </table>
+        </div>
