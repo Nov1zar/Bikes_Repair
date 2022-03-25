@@ -1,0 +1,37 @@
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          google.script.run.withSuccessHandler(onSuccess1).randomQuotes();})
+
+        
+        function onSuccess1(quoteData) {
+            var quoteActual = document.getElementById('quote');
+            quoteActual.innerHTML = quoteData.quote;
+            var quoteActual = document.getElementById('qouteCharacter');
+            quoteActual.innerHTML = quoteData.character;
+            
+            var quoteImg = document.getElementById('quoteImage');
+            quoteImg.innerHTML = quoteData.imageTag;
+        }
+        
+        setInterval(function() {
+        console.log("getting quote...")
+            google.script.run.withSuccessHandler(onSuccess1).randomQuotes();
+        }, 10000);
+
+
+    </script>
+
+
+    <script>
+        function onSuccess2(now) {
+            var div = document.getElementById('time');
+            var today = new Date();
+            var time = today.getHours() + " : " + today.getMinutes() + " : " + today.getSeconds();
+            div.innerHTML = time;
+        }
+        
+        setInterval(function() {
+        console.log("getting time...")
+            google.script.run.withSuccessHandler(onSuccess2).getTime();
+        }, 1000);
+    </script>
