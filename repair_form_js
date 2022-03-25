@@ -1,0 +1,404 @@
+<script>
+
+    const statuses = {
+    created: "Создана",
+    completed: "Подтверждена",
+    payed: "Оплачена"
+    }
+    
+    const numBit = (item) => {
+    const numData = item
+    return  numData  > 0 ? Number(numData).toLocaleString()+" ₽" : ""
+    }
+
+
+    google.script.url.getLocation(location => {
+      const form_show_id = document.getElementById("form_show_id")
+      const bikeShowType = document.getElementById("bike_type")
+      
+      
+      form_show_id.innerText = "Форма ремонта #"+`${location.parameter.id}`
+      form_show_id.value = location.parameter.id
+      google.script.run.withSuccessHandler(
+        loadShowRepair2 
+        ).smartDataLoadForm(form_show_id.value)
+    })
+
+  document.addEventListener('DOMContentLoaded',function(){
+    var elems = document.querySelectorAll('select');
+    var instances = M.FormSelect.init(elems);
+
+
+    const submitButton = document.getElementById("submitButton")
+    const paymentButton = document.getElementById("paymentButton")
+    const addtoFormButton = document.getElementById("butn")
+    const preloader = document.getElementById("preloader")
+    const loading = document.getElementById('loading')
+    const bikeShowType = document.getElementById("bike_type")
+
+    submitButton.addEventListener("click",clickEventHandler)
+    paymentButton.addEventListener("click",clickEventHandler)
+    
+
+    
+    // google.script.run.withSuccessHandler(populateWords).getWords()
+    addtoFormButton.addEventListener("click", addNewGearToForm)
+    document.getElementById("gears_name").addEventListener("keyup", function() {setTimeout (checkGearsInfo,800)})
+    document.getElementById("gears_name").addEventListener("input", checkGearsInfo)
+    document.getElementById("gears_name").addEventListener("change", function() {setTimeout (checkGearsInfo,500)})
+    document.getElementById("loadTable").addEventListener("click",clickEventHandler)  
+    });
+
+  function populateWords2 (){
+    
+  }
+
+
+  function populateWords(words){     
+    var el = document.getElementById("gears_name");
+    var instances = M.Autocomplete.init(el, {data: words});      
+        M.updateTextFields();
+  }
+
+
+  function checkGearsInfo(){
+    var gears_name_field = document.getElementById("gears_name").value
+    if(gears_name_field.length > 5){
+      google.script.run
+        .withSuccessHandler(updateGearsInfo)
+        .modernLookInfo(gears_name_field)        
+    }else {
+      
+      document.getElementById("gears_id").value = "Не найден в базе"
+      document.getElementById("gears_type").value = "Не найден в базе"
+      document.getElementById("gears_work").value = "Не найден в базе"
+      document.getElementById("gears_price").value = "Не найден в базе"
+      document.getElementById("gears_repair_rent").value = "Не найден в базе"
+      M.updateTextFields();
+    }
+  }
+
+  function updateGearsInfo(info){
+      
+      if (info === null)
+
+          {document.getElementById("gears_id").value = "Не найден в базе"
+          document.getElementById("gears_type").value = "Не найден в базе"
+          document.getElementById("gears_work").value = "Не найден в базе"
+          document.getElementById("gears_price").value = "Не найден в базе"
+          document.getElementById("gears_repair_rent").value = "Не найден в базе"
+          M.updateTextFields();
+          }else{
+
+      document.getElementById("gears_id").value = info.gears_id
+      document.getElementById("gears_type").value = info.gears_type
+      document.getElementById("gears_work").value = info.gears_work
+      document.getElementById("gears_price").value = info.gears_price
+      document.getElementById("gears_repair_rent").value = info.gears_repair_rent
+      M.updateTextFields();
+      }
+    
+  }
+
+
+
+  function addNewGearToForm(){
+    
+    const addtoFormButton = document.getElementById("butn")
+    preloader.style.display = "block"
+    addtoFormButton.disabled = true
+
+    var formInfo = {}
+    formInfo.form_id = document.getElementById("form_show_id").value
+    formInfo.bike_id = document.getElementById("bike_id").value
+    formInfo.bike_type = document.getElementById("bike_type").value   
+    formInfo.form_status = document.getElementById("form_status").value
+
+    var gearsInfo = {}
+    gearsInfo.gears_id = document.getElementById("gears_id").value ,
+    gearsInfo.gears_name = document.getElementById("gears_name").value
+    gearsInfo.gears_type = document.getElementById("gears_type").value
+    gearsInfo.gears_repair_rent = document.getElementById("gears_repair_rent").value
+    gearsInfo.gears_quantity = document.getElementById("gears_quantity").value
+    gearsInfo.gears_price = document.getElementById("gears_price").value
+    gearsInfo.gears_work = document.getElementById("gears_work").value
+
+    if(gearsInfo.gears_type != "Не найден в базе" || gearsInfo.gears_price != "Не найден в базе" || gearsInfo.gears_work != "Не найден в базе")
+    {if(formInfo.bike_type == gearsInfo.gears_type)
+    {if(gearsInfo.gears_quantity == ""){
+          preloader.style.display = "none"
+          addtoFormButton.disabled = false
+          M.toast({html: 'Укажи сколько нужно таких запчастей'})}else{
+            google.script.run.withSuccessHandler(function(){
+            google.script.run.withSuccessHandler(loadShowRepair2).smartDataLoadForm(form_show_id.value);
+
+            M.toast({html: 'Добавляем запчасть в форму'});
+            document.getElementById("gears_id").value = ""
+            document.getElementById("gears_name").value = ""
+            document.getElementById("gears_quantity").value = ""
+            document.getElementById("gears_type").value = ""
+            document.getElementById("gears_work").value = ""
+            document.getElementById("gears_price").value = ""
+            document.getElementById("gears_repair_rent").value = ""
+            M.updateTextFields()
+            addtoFormButton.disabled = false
+          }).addNewGearsToForm(gearsInfo, formInfo);
+    }}
+    else{
+      preloader.style.display = "none"
+      addtoFormButton.disabled = false
+      M.toast({html: 'Тип запчасти не совпадает с типом велосипеда, выбери запчасть которая совпадает с типом велосипеда'})}}
+    else{
+      preloader.style.display = "none"
+      addtoFormButton.disabled = false      
+      M.toast({html: 'Указанная запчасть отсутствует в справочнике запчастей, сначала запчасть нужно добавить'})}
+
+  }
+
+  
+  function clickEventHandler(e){
+    if (e.target.matches(".delete_gear_button") || e.target.matches(".delete_gear_icon")){
+      if (confirm('Точно хочешь удалить запчасть из формы?')) {
+          deleteRowInForm(e)
+      }
+    }if (e.target.matches("#submitButton")){
+      approveFormJS()
+      
+    }if (e.target.matches("#paymentButton")){
+      var sign = prompt('А ты создал удержание в Админке? Если да, то введи пароль') 
+      if (sign.toLowerCase() == "admin"){
+        payFormJS()
+      }else{
+        M.toast({html: 'Неправильный пароль'})
+      }
+      
+  }
+  }
+
+  function approveFormJS(){
+    var showTotalQuantity = document.getElementById("total_gears_quantity").value
+    loading.style.display = 'block'
+    submitButton.disabled = true
+    if(showTotalQuantity === 0){
+      M.toast({html: 'Нельзя подтвердить пустую форму, добавь запчасти или удали форму ремонта'})
+      submitButton.disabled = false
+      loading.style.display = 'none'
+      }else
+    {var form_id = document.getElementById("form_show_id").value
+    
+    google.script.run.withSuccessHandler(function(){
+      google.script.run.withSuccessHandler(loadShowRepair2).smartDataLoadForm(form_show_id.value);
+      M.toast({html: 'Форма ремонта подтверждена'})
+      loading.style.display = 'none'
+    }).approveForm(form_id)}
+  }
+
+
+  function payFormJS(){
+    paymentButton.disabled = true
+    loading.style.display = "block"
+    
+    var form_id = document.getElementById("form_show_id").value
+    google.script.run.withSuccessHandler(function(){
+      google.script.run.withSuccessHandler(loadShowRepair2).smartDataLoadForm(form_show_id.value);
+      M.toast({html: 'Форма ремонта оплачена'})
+      loading.style.display = "none"
+    }).payForm(form_id)
+  }
+
+    
+
+  function deleteRowInForm(e){
+    loading.style.display = "block"
+    var rowID = e.target.dataset
+    rowID = JSON.parse(JSON.stringify(rowID));
+    google.script.run.withSuccessHandler(function(){
+    google.script.run.withSuccessHandler(loadShowRepair2).smartDataLoadForm(form_show_id.value);
+    e.target.closest('tr').remove()
+    M.toast({html: 'Удалили запчасть из формы'});
+    loading.style.display = "none"
+    })
+    .deleteRowInForm(rowID)      
+  }
+
+
+  function loadShowRepair2([dataObject, formInfo]){
+
+
+    preloader.style.display = "block"    
+
+    var addtoFormButton = document.getElementById("butn")
+    var formShowStatus = document.getElementById("form_status")
+    var formShowId = document.getElementById("form_show_id")
+    var bikeShowId = document.getElementById("bike_id")
+    var bikeShowType = document.getElementById("bike_type")
+    var bikeRent = document.getElementById("bike_rent")
+    var rentRepair = document.getElementById("rent_repair")
+    var bikeOwner = document.getElementById("bike_owner")
+    var riderName = document.getElementById("rider_name")
+    var showTotalQuantity = document.getElementById("total_gears_quantity")
+    var showTotalPrice = document.getElementById("total_gears_price")
+    var showTotalWork = document.getElementById("total_gears_work")
+    var showTotalRepairAmount = document.getElementById("total_repair_amount")
+    var showTotaRepairRentAmount = document.getElementById("total_repair_rent_amount")
+    var showTotalAmountToPay = document.getElementById("total_amount_to_pay")
+    var table = document.getElementById('loadTable')
+    var assignedWorker = document.getElementById('assigned_worker')
+    var rentRepair = document.getElementById('rent_repair')
+    
+    // console.log(formInfo)
+    // console.log(dataObject)
+    
+
+    var gearsInfo = {}
+      gearsInfo.gears_id = document.getElementById("gears_id")
+      gearsInfo.gears_name = document.getElementById("gears_name")
+      gearsInfo.gears_type = document.getElementById("gears_type")
+      gearsInfo.gears_repair_rent = document.getElementById("gears_repair_rent")
+      gearsInfo.gears_quantity = document.getElementById("gears_quantity")
+      gearsInfo.gears_price = document.getElementById("gears_price")
+      gearsInfo.gears_work = document.getElementById("gears_work")
+    
+
+
+    formShowStatus.innerHTML = "Статус формы: " + formInfo.form_status
+    formShowStatus.value = formInfo.form_status
+    assignedWorker.innerHTML = "Мастер по ремонту: " + formInfo.assigned_worker
+    rentRepair.innerHTML = "Ремонт по ТО: " + formInfo.rent_repair
+    rentRepair.value = formInfo.rent_repair
+  
+    
+    bikeShowId.innerHTML = "Номер велосипеда: " + formInfo.bike_id;
+    bikeShowId.value = formInfo.bike_id
+    bikeShowType.innerHTML = "Тип велосипеда: " + formInfo.bike_type;
+    bikeShowType.value = formInfo.bike_type
+    bikeRent.innerHTML = "Инфо об аренде: " + formInfo.bike_rent;
+    bikeRent.value = formInfo.bike_rent;
+    bikeOwner.innerHTML = "Владелец: " + formInfo.bike_owner
+    bikeOwner.value = formInfo.bike_owner
+    riderName.innerHTML = "ФИО райдера: " + formInfo.rider_name
+    riderName.value = formInfo.rider_name
+
+    // console.log(rentRepair.value)
+    
+    // console.log(dataObject.filter(function(el){return el.gears_repair_rent === "Да"}).reduce((a, {repair_amount}) => a + repair_amount, 0))
+    
+    
+    table.innerHTML = ""
+    
+
+
+
+    var k = '<tbody>'
+        for(i = 0;i < dataObject.length; i++){
+            k+= '<tr>';
+            k+= '<td>' + dataObject[i].gears_id + '</td>';
+            k+= '<td>' + dataObject[i].gears_name + '</td>';
+            k+= '<td>' + dataObject[i].gears_type + '</td>';
+            k+= '<td>' + dataObject[i].gears_repair_rent + '</td>';
+            k+= '<td>' + dataObject[i].gears_quantity + '</td>';
+            k+= '<td>' + numBit(dataObject[i].gears_price) + '</td>';
+            k+= '<td>' + numBit(dataObject[i].gears_work) + '</td>';
+            k+= '<td>' + numBit(dataObject[i].repair_amount) + '</td>';
+            
+            k+= `<td><button class="btn waves-effect waves-light red delete_gear_button" disabled data-row-id="${dataObject[i].row_id}" id = "delete_gear_button"><i class="material-icons center delete_gear_icon" id="delete_gear_icon"  data-row-id="${dataObject[i].row_id}">delete_forever</i></button></td>`;
+            k+= '</tr>';     
+        }
+        k+='</tbody>';
+
+        table.innerHTML = k;
+
+        
+        
+
+        var deleteButtons = document.querySelectorAll(".delete_gear_button")              
+          switch (formInfo.form_status)
+        {
+          case statuses.completed:
+              deleteButtons.forEach(function(x){
+                x.disabled = true
+              })
+              submitButton.disabled = true
+              paymentButton.disabled = false
+
+              gearsInfo.gears_id.disabled = true
+              gearsInfo.gears_name.disabled = true
+              gearsInfo.gears_quantity.disabled = true
+              addtoFormButton.disabled = true
+
+
+              
+              break;
+          case statuses.payed:
+              deleteButtons.forEach(function(x){
+                x.disabled = true
+              })
+              submitButton.disabled = true
+              paymentButton.disabled = true
+
+              gearsInfo.gears_id.disabled = true
+              gearsInfo.gears_name.disabled = true
+              gearsInfo.gears_quantity.disabled = true
+              addtoFormButton.disabled = true
+
+
+
+
+              break;
+          case statuses.created:
+              submitButton.disabled = false
+              paymentButton.disabled = true
+              deleteButtons.forEach(function(x){
+                x.disabled = false
+              })
+              gearsInfo.gears_id.disabled = false
+              gearsInfo.gears_name.disabled = false
+              gearsInfo.gears_quantity.disabled = false
+              addtoFormButton.disabled = false
+              break;
+        } 
+
+
+
+
+
+    
+
+    const totalInfo = {
+    total_gears_quantity: dataObject.reduce((a, {gears_quantity}) => a + gears_quantity, 0),
+    total_gears_price: dataObject.reduce((a, {gears_price}) => a + gears_price, 0),
+    total_gears_work: dataObject.reduce((a, {gears_work}) => a + gears_work, 0),
+    total_repair_amount: dataObject.reduce((a, {repair_amount}) => a + repair_amount, 0),
+    total_repair_rent_amount: rentRepair.value === "Да" ? dataObject.filter(function(el){return el.gears_repair_rent === "Да"}).reduce((a, {repair_amount}) => a + repair_amount, 0) : 0
+    }
+
+    showTotalQuantity.innerHTML = "Количество деталей: "+ totalInfo.total_gears_quantity
+    showTotalQuantity.value = totalInfo.total_gears_quantity
+    
+    showTotalPrice.innerHTML = "Стоимость деталей: " + numBit(totalInfo.total_gears_price)
+    showTotalWork.innerHTML = "Стоимость работ: " + numBit(totalInfo.total_gears_work)
+
+
+
+
+    showTotalRepairAmount.innerHTML = "Общая стоимость: " + numBit(totalInfo.total_repair_amount)
+    showTotaRepairRentAmount.innerHTML = "Покрытие ТО: " + numBit(totalInfo.total_repair_rent_amount)
+    showTotalAmountToPay.innerHTML = "Стоимость к оплате: " + numBit(totalInfo.total_repair_amount - totalInfo.total_repair_rent_amount)
+    showTotaRepairRentAmount.innerHTML = "Покрытие ТО: " + numBit(totalInfo.total_repair_rent_amount)
+    // console.log(totalInfo.total_repair_amount, totalInfo.total_repair_rent_amount)
+    
+    
+    
+    preloader.style.display = "none"
+
+  
+    
+    google.script.run.withSuccessHandler(populateWords).getWords2(formInfo.bike_type)
+     
+}
+
+
+
+
+
+</script>
