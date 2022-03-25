@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?!= include("head_html"); ?>
+</head>
+
+  <body>
+      <div>
+        <ul id="slide-out" class="sidenav">
+          <!-- <li><a href="https://admin.localkitchen.ru/" target="_blank" rel="noopener noreferrer">Перейти в админку</a></li> -->
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=dash" id="dash">Дашборд ремонта</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=" id="library">Справочник Запчастей</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=about" id="about">Скоротать время</a></li>
+          
+          <li><a href=" <?= ScriptApp.getService().getUrl(); ?>?v=repair_index" id="repair_index">Формы Ремонта</a></li>
+
+        </ul>
+        <a href="" data-target="slide-out" class="sidenav-trigger "><i class="medium material-icons">menu</i></a>
+      </div>   
+    <?!= include("head_html"); ?>
+    <?!= include("menu_html"); ?>
+    <?!= include("style_css"); ?>
+    <?!= include("repair_form_js"); ?>
+
+             
+    
+      <div id="returnButton">
+        <a href=" <?= ScriptApp.getService().getUrl(); ?>?v=repair_index">
+          <button class="btn light-blue show-form-button" id = "show_form" type="submit">
+            Назад к формам  
+          </button>
+        </a>
+      </div>
+    <div class="container">
+    
+      
+    
+    <div class="row col s12">
+      <h3 id="form_show_id"></h3>
+      <div class="col s4">
+        <span class="lb" id="bike_id">Номер велосипеда: </span>
+        <span class="lb" id="bike_type">Тип велосипеда: </span>
+        <span class="lb" id="bike_owner">Владелец: </span>
+        <span class="lb" id="bike_rent">Инфо об Аренде: </span>
+        <span class="lb" id="rider_name">ФИО Райдера: </span>
+      </div>
+      <div class="col s4">
+        <span class="lb" id="form_status">Статус формы: </span>
+        <span class="lb" id="assigned_worker">Мастер по ремонту: </span>
+        <span class="lb" id="total_gears_quantity">Количество деталей: </span>
+        <span class="lb" id="total_gears_price">Сумма деталей: </span>
+        <span class="lb" id="total_gears_work">Сумма работ: </span>
+      </div>
+      <div class="col s4">
+        <span class="lb" id="rent_repair">Ремонт по ТО: </span>
+        <span class="lb" id="total_repair_amount">Общая стоимость: </span>
+        <span class="lb" id="total_repair_rent_amount">Покрытие ТО: </span>
+        <span class="lb" id="total_amount_to_pay">Стоимость к оплате: </span>
+      </div>
+    </div>
+    <br></br>
+    <div class="row col s12">
+      <div class="input-field col s1" style="display: none">
+        <input disabled type="text" id="gears_id" class="validate" >
+        <label for="gears_id" class="active">ID</label>
+      </div>
+      <div class="input-field col s1" style="display: none">
+        <input disabled type="text" id="gears_repair_rent" class="validate" >
+        <label for="gears_repair_rent" class="active">Входит в ТО?</label>
+      </div>
+      <div class="input-field col s3">
+        <input type="text" id="gears_name" class="autocomplete" disabled>
+        <label for="gears_name" class="active">Введи название запчасти</label>
+      </div>
+      <div class="input-field col s1">
+        <input type="number" id="gears_quantity" class="validate" disabled>
+        <label for="gears_quantity" class="active">Количество</label>
+        
+      </div>
+      <div class="input-field col s2">
+        <input disabled id="gears_type" type="text"  class="validate">
+        <label for="gears_type" class="active">Тип запчасти</label>
+      </div>
+      <div class="input-field col s2">
+        <input disabled id="gears_price" type="text"  class="validate">
+        <label for="gears_type" class="active">Стоимость запчасти</label>
+      </div>
+      <div class="input-field col s2">
+        <input disabled id="gears_work" type="text"  class="validate">
+        <label for="gears_type" class="active">Стоимость работ</label>
+      </div>
+      <div class="input-field col s2">
+        <button class="btn light-blue" id = "butn" disabled>Добавить
+          <i class="material-icons left">add</i>
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="progress col s12" id="preloader" >
+        <div class="indeterminate"></div>
+      </div>
+    </div>
+
+    <div class="row">
+      
+
+    <div id="dataTable" class="table-responsive">
+            
+          <table class="highlight" id="showFormTable">
+          <thead>
+            <tr>
+                <th scope="col">ID Детали</th>
+                <th scope="col">Название детали</th>
+                <th scope="col">Тип детали</th>
+                <th scope="col">Входит в ТО?</th>
+                <th scope="col">Количество</th>
+                <th scope="col">Цена детали</th>
+                <th scope="col">Цена работы</th>
+                <th scope="col">Сумма</th>
+                <th scope="col"></th>
+            </tr>
+          </thead>
+
+
+
+          <tbody id="loadTable">
+
+          </tbody>
+        </table>
+
+
+
+      </div>
+        <div class="row formActionButtons">
+          <button class="btn light-blue " id = "submitButton" disabled>Подтвердить ремонт
+            <i class="material-icons left">check_circle</i>
+          </button>
+          <button class="btn light-green " id = "paymentButton" disabled>Оплатить ремонт
+            <i class="material-icons left">attach_money</i>
+          </button>
+        </div>
+      </div>
+
+
+
+    </div> <!-- END of container -->
+
+
+<div id="loading" class="loading">
+  <div class="loader">
+    <div class="inner one"></div>
+    <div class="inner two"></div>
+    <div class="inner three"></div>
+  </div>
+</div>
+
+  </body>
+  </html>
+
+
+<script>
+
+</script>
