@@ -1,0 +1,273 @@
+<script>
+  
+  var data;
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems,{dismissible: false});
+    var elements = document.querySelectorAll('select');
+    var instances = M.FormSelect.init(elements);
+    // google.script.run.withSuccessHandler(generateGearsLibrary).getDataForTable();
+    google.script.run.withSuccessHandler(loadGearLib).getDataForTable();
+    document.getElementById("gears_type_selector").addEventListener('change',filterTable)
+    const preloader = document.getElementById("preloader")
+    const loading = document.getElementById("loading")
+
+  });
+
+
+ function addNewGear(){
+
+    var gearTypeCheckbox = document.getElementById("gears_type")
+    var gearRentCheckbox = document.getElementById("gears_repair_rent")
+
+    var gearsInfo = {}
+    gearsInfo.gearsName = document.getElementById("gears_name").value
+    gearsInfo.gearsPrice = document.getElementById("gears_price").value
+    gearsInfo.gearsWork = document.getElementById("gears_work").value
+    gearsInfo.gearsType = document.getElementById("gears_type").value
+    gearTypeCheckbox.checked == true ? gearsInfo.gearsType = "Электрический" : gearsInfo.gearsType = "Педальный"
+    gearRentCheckbox.checked == true ? gearsInfo.gearsRepairRent = "Да" : gearsInfo.gearsRepairRent = "Нет"
+
+
+    if(gearsInfo.gearsName == "" || gearsInfo.gearsPrice == "" || gearsInfo.gearsWork == ""){
+      M.toast({html: 'Название запчасти, ее стоимость и стоимость работ обязательны к заполнению'});
+    }else{
+      var sign = prompt('Точно хочешь добавить новую запчасть в справочник? Если уверен → введи пароль') 
+      if (sign.toLowerCase() == "admin"){
+      preloader.style.display = "block"
+      loading.style.display = "block"
+      google.script.run.withSuccessHandler(function(){
+      google.script.run.withSuccessHandler(loadGearLib).getDataForTable();
+      loading.style.display = "none"
+
+      M.toast({html: 'Запчасть добавили в список'});
+      }).addNewGears(gearsInfo)
+      document.getElementById("gears_name").value = ""
+      document.getElementById("gears_price").value = ""
+      document.getElementById("gears_work").value = ""
+      gearTypeCheckbox.checked = false ;
+      gearRentCheckbox.checked = false;
+      M.updateTextFields();  
+      
+      }else{
+        M.toast({html: 'Неправильный пароль'})
+        document.getElementById("gears_name").value = ""
+        document.getElementById("gears_price").value = ""
+        document.getElementById("gears_work").value = ""
+        gearTypeCheckbox.checked = false ;
+        gearRentCheckbox.checked = false;
+      }
+      
+      
+    }
+
+ }
+
+  function editFunction(){
+    var id = document.getElementById("gears_id_edit").value
+    var gearTypeCheckbox = document.getElementById("gears_type_edit")
+    var gearRentCheckbox = document.getElementById("gears_repair_rent_edit")
+    var gearsInfo = {}
+        gearsInfo.gearsName = document.getElementById("gears_name_edit").value
+        gearsInfo.gearsPrice = document.getElementById("gears_price_edit").value
+        gearsInfo.gearsWork = document.getElementById("gears_work_edit").value
+        gearsInfo.gearsType = document.getElementById("gears_type_edit").value
+        gearsInfo.gearsRepairRent = document.getElementById("gears_repair_rent_edit").value
+        gearTypeCheckbox.checked == true ? gearsInfo.gearsType = "Электрический" : gearsInfo.gearsType = "Педальный";
+        gearRentCheckbox.checked == true ? gearsInfo.gearsRepairRent = "Да" : gearsInfo.gearsRepairRent = "Нет";
+    
+    if(gearsInfo.gearsName == "" || gearsInfo.gearsPrice == "" || gearsInfo.gearsWork == ""){
+      M.toast({html: 'Название запчасти, ее стоимость и стоимость работ обязательны к заполнению'});
+      }else {
+        google.script.run.withSuccessHandler(function(res){
+          google.script.run.withSuccessHandler(loadGearLib).getDataForTable();
+          M.toast({html: 'Отредактировали запчасть'});
+        }).editGearsById(id, gearsInfo)
+      }
+}
+
+
+  function editModalLoad(params){
+    document.getElementById("gears_id_edit").innerHTML = "ID: " + params.gears_ID;
+    document.getElementById("gears_id_edit").value = params.gears_ID;
+    google.script.run.withSuccessHandler(function(gearsInfo){
+      console.log(gearsInfo)
+      var gearTypeCheckbox = document.getElementById("gears_type_edit")
+      var gearRentCheckbox = document.getElementById("gears_repair_rent_edit")
+      document.getElementById("gears_name_edit").value = gearsInfo.gearsName;
+      document.getElementById("gears_price_edit").value = gearsInfo.gearsPrice;
+      document.getElementById("gears_work_edit").value = gearsInfo.gearsWork;
+      gearsInfo.gearsType == "Электрический" ?  gearTypeCheckbox.checked = true : gearTypeCheckbox.checked = false;
+      gearsInfo.gearsRepairRent == "Да" ? gearRentCheckbox.checked = true : gearRentCheckbox.checked = false;
+      M.updateTextFields();   
+    }).getDataForEdit(params.gears_ID);   
+
+
+
+  }
+
+  function loadGearLib(dataArray){
+
+    preloader.style.display = "block"
+
+    const numBit = (item) => {
+    const numData = item
+    return  numData  > 0 ? Number(numData).toLocaleString()+" ₽" : ""
+    }
+
+    var resultsArray = document.getElementById("loadTable");
+    resultsArray.innerHTML = "";
+    var templateBox = document.getElementById("rowTemplate");
+    var template = templateBox.content;
+    
+
+    dataArray.forEach(function(r){
+      var tr = template.cloneNode(true);
+      var gears_idColumn = tr.querySelector(".gears_id");
+      var gears_nameColumn = tr.querySelector(".gears_name");
+      var gears_typeColumn = tr.querySelector(".gears_type");
+      var gears_repair_rentColumn = tr.querySelector(".gears_repair_rent");
+      var gears_priceColumn = tr.querySelector(".gears_price");
+      var gears_workColumn = tr.querySelector(".gears_work");
+      var editButton = tr.querySelector(".edit-button");
+      var editIcon = tr.querySelector(".edit-icon");
+      var deleteButton = tr.querySelector(".delete-button");
+      var deleteIcon = tr.querySelector(".delete-icon");
+      
+      gears_idColumn.textContent = r[0];
+      deleteButton.dataset.gearId = r[0];
+      deleteIcon.dataset.gearId = r[0];
+      editButton.dataset.gearId = r[0];
+      editIcon.dataset.gearId = r[0];
+      gears_nameColumn.textContent = r[1];
+      gears_typeColumn.textContent = r[2];
+      gears_repair_rentColumn.textContent = r[3];
+      gears_priceColumn.textContent = numBit(r[4]);
+      gears_workColumn.textContent = numBit(r[5]);
+
+      resultsArray.appendChild(tr);
+    });
+    preloader.style.display = "none"
+   
+  }
+
+
+
+
+
+  function deleteGearsID(e){
+
+    loading.style.display = "block"
+
+    var gears_ID = e.target.dataset.gearId
+    google.script.run.withSuccessHandler(function(){
+      e.target.closest(".tableRows").remove()
+      M.toast({html: 'Удалили запчасть из справочника'});
+      loading.style.display = "none"
+    }).deleteByID(gears_ID)
+  }
+  document.getElementById("saveChanges").addEventListener("click",clickEventHandler)
+  document.getElementById("loadTable").addEventListener("click",clickEventHandler)
+
+  function clickEventHandler(e){
+    if (e.target.matches(".delete-button") || e.target.matches(".delete-icon")){
+
+      var sign = prompt('Точно хочешь удалить запчасть из справочника? Если уверен → введи пароль') 
+      if (sign.toLowerCase() == "admin"){
+        deleteGearsID(e)
+      }else{
+        M.toast({html: 'Неправильный пароль'})
+      }
+    }
+    if (e.target.matches(".edit-button") || e.target.matches(".edit-icon")){
+        var sign = prompt('Точно хочешь отредактировать запчасть из справочника? Если уверен → введи пароль') 
+      if (sign.toLowerCase() == "admin"){
+        var params = {gears_ID: e.target.dataset.gearId}
+        editModalLoad(params)
+      }else{
+        M.toast({html: 'Неправильный пароль'})
+      }
+
+    }
+    if (e.target.matches("#saveChanges")){
+      editFunction()
+    }
+  }
+      
+function searchTable(){
+  const searchInput = document.querySelector('#search');
+  const tableRows = document.querySelector('#loadTable').querySelectorAll('tr');
+
+  searchInput.addEventListener('input', (e) => {
+    const searchInputValue = e.target.value.toLowerCase();
+    tableRows.forEach(row => {
+      const doesRowMatch = row.textContent.toLowerCase().includes(searchInputValue);
+      if (doesRowMatch) {
+        row.style.display = 'table-row';
+      } else {
+        row.style.display = 'none';
+      }
+    })
+  })
+}
+
+
+
+  
+ 
+
+// Restricts input for the given textbox to the given inputFilter.
+function setInputFilter(textbox, inputFilter) {
+  ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+    textbox.addEventListener(event, function() {
+      if (inputFilter(this.value)) {
+        this.oldValue = this.value;
+        this.oldSelectionStart = this.selectionStart;
+        this.oldSelectionEnd = this.selectionEnd;
+      } else if (this.hasOwnProperty("oldValue")) {
+        this.value = this.oldValue;
+        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+      } else {
+        this.value = "";
+      }
+    });
+  });
+}
+
+setInputFilter(document.getElementById("gears_price_edit"), function(value) {
+  return /^-?\d*[.,]?\d{0,2}$/.test(value); });
+setInputFilter(document.getElementById("gears_work_edit"), function(value) {
+  return /^-?\d*[.,]?\d{0,2}$/.test(value); });
+setInputFilter(document.getElementById("gears_price"), function(value) {
+  return /^-?\d*[.,]?\d{0,2}$/.test(value); });
+setInputFilter(document.getElementById("gears_work"), function(value) {
+  return /^-?\d*[.,]?\d{0,2}$/.test(value); });
+
+
+function filterTable() {
+  // Variables
+  let dropdown, table, rows, cells, country, filter;
+  dropdown = document.getElementById("gears_type_selector");
+  table = document.getElementById("loadTable");
+  rows = table.getElementsByTagName("tr");
+  filter = dropdown.value;
+
+  // Loops through rows and hides those with countries that don't match the filter
+  for (let row of rows) { // `for...of` loops through the NodeList
+    cells = row.getElementsByTagName("td");
+    country = cells[1] || null; // gets the 2nd `td` or nothing
+    console.log(country.textContent)
+    // if the filter is set to 'All', or this is the header row, or 2nd `td` text matches filter
+    if (filter === "Все вместе" || !country || (filter === country.textContent)) {
+      row.style.display = ""; // shows this row
+    }
+    else {
+      row.style.display = "none"; // hides this row
+    }
+  }
+}
+
+
+
+
+</script>
