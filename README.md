@@ -2,4 +2,4 @@
 Функционал ремонта в гугле
 
 
-Исходник таблицы: https://docs.google.com/spreadsheets/d/1RjvRglgv9n9BX0v4P6UElVWPTgPAQu81wiyrI2vX_HM/edit#gid=0
+Исходник таблицы: https://docs.google.com/spreadsheets/d/13B15fVo6lfL_4MYQFQQ1fnbzGT_ZHGpSq50Ln9z8XeE/edit#gid=0
